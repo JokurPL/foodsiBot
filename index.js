@@ -5,54 +5,11 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const intervalTime = 0.1;
 const channelId = "1092473836739506386";
-const foodsiEmbed = {
-  color: 0x0099ff,
-  title: "Nazwa",
-  url: "https://discord.js.org",
-  author: {
-    name: "Nazwa restauracji",
-    icon_url: "https://i.imgur.com/AfFp7pu.png",
-    url: "https://discord.js.org",
-  },
-  description: "opis",
-  thumbnail: {
-    url: "https://i.imgur.com/AfFp7pu.png",
-  },
-  fields: [
-    {
-      name: "Regular field title",
-      value: "Some value here",
-    },
-    {
-      name: "\u200b",
-      value: "\u200b",
-      inline: false,
-    },
-    {
-      name: "Inline field title",
-      value: "Some value here",
-      inline: true,
-    },
-    {
-      name: "Inline field title",
-      value: "Some value here",
-      inline: true,
-    },
-    {
-      name: "Inline field title",
-      value: "Some value here",
-      inline: true,
-    },
-  ],
-  image: {
-    url: "https://i.imgur.com/AfFp7pu.png",
-  },
-  timestamp: new Date().toISOString(),
-  footer: {
-    text: "Some footer text here",
-    icon_url: "https://i.imgur.com/AfFp7pu.png",
-  },
+
+const getLeadingZero = (date) => {
+  return (date < 10 ? "0" : "") + date;
 };
+
 client.once(Events.ClientReady, (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
 
@@ -80,23 +37,31 @@ client.once(Events.ClientReady, (c) => {
               },
               {
                 name: "Cena:",
-                value: `~~${restaurant.meal.original_price}~~ zł | ${restaurant.meal.price} zł`,
+                value: `~~${restaurant.meal.original_price}zł~~ | ${restaurant.meal.price} zł`,
               },
               {
                 name: "Typ paczki",
                 value: restaurant.package_type,
               },
               {
-                name: "Godziny odbioru",
-                value: `${new Date(
-                  restaurant.package_day.collection_day.opened_at
-                ).getHours()}:${new Date(
-                  restaurant.package_day.collection_day.opened_at
-                ).getMinutes()} - ${new Date(
-                  restaurant.package_day.collection_day.closed_at
-                ).getHours()}:${new Date(
-                  restaurant.package_day.collection_day.closed_at
-                ).getMinutes()}`,
+                name: "Data odbioru",
+                value: `${restaurant.for_day} ${getLeadingZero(
+                  new Date(
+                    restaurant.package_day.collection_day.opened_at
+                  ).getHours()
+                )}:${getLeadingZero(
+                  new Date(
+                    restaurant.package_day.collection_day.opened_at
+                  ).getMinutes()
+                )} - ${getLeadingZero(
+                  new Date(
+                    restaurant.package_day.collection_day.closed_at
+                  ).getHours()
+                )}:${getLeadingZero(
+                  new Date(
+                    restaurant.package_day.collection_day.closed_at
+                  ).getMinutes()
+                )}`,
               },
             ],
           },

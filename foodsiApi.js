@@ -67,7 +67,7 @@ const updateData = async (newData) => {
       return Number(restaurant.id) > Number(highestId);
     });
     // console.log(newRestauransts);
-    saveData(await getData());
+    saveData(newData);
     return newRestauransts;
   } else {
     console.log("Data up to date");
