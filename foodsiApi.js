@@ -1,12 +1,12 @@
-import fetch from "node-fetch";
+import axios from "axios";
 import fs, { readFileSync } from "fs";
 
 import config from "./userConfig.js";
 
 const getData = async () => {
-  const raw = JSON.stringify({
+  const data = JSON.stringify({
     page: 1,
-    per_page: 15,
+    per_page: 100,
     distance: {
       lat: config.location.lat,
       lng: config.location.lng,
@@ -20,59 +20,43 @@ const getData = async () => {
     },
   });
 
-  const requestOptions = {
-    method: "POST",
+  const requestConfig = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "https://api.foodsi.pl/api/v2/restaurants",
     headers: {
       "Content-Type": "application/json",
       "system-version": "android_3.0.0",
       "User-Agent": "okhttp/3.12.0",
     },
-    body: raw,
-    redirect: "follow",
+    data: data,
   };
 
-  const response = await fetch(
-    "https://api.foodsi.pl/api/v2/restaurants",
-    requestOptions
-  );
+  try {
+    const response = await axios.request(requestConfig);
 
-  return response.json();
+    return response.data.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const saveData = async (data) => {
-  await fs.writeFile(
-    "./data.json",
-    JSON.stringify(data.data),
-    "utf-8",
-    (err) => {
-      err ? console.error(err) : console.log("Data saved");
-    }
-  );
+  await fs.writeFile("./data.json", JSON.stringify(data), "utf-8", (err) => {
+    err ? console.error(err) : console.log("Data saved");
+  });
 };
 
 const updateData = async (newData) => {
   const dataFromFile = JSON.parse(readFileSync("./data.json"));
-  if (JSON.stringify(dataFromFile) != JSON.stringify(newData.data)) {
-    console.log("Need update");
-    const highestId = Math.max(
-      ...dataFromFile.map((restaurant) => restaurant.id)
-    );
-    console.log(`Highest ID: ${highestId}`);
-    const newRestauransts = newData.data.filter((restaurant) => {
-      console.log(
-        `${Number(restaurant.id)} > ${Number(highestId)} \t ${
-          Number(restaurant.id) > Number(highestId)
-        }`
-      );
-      return Number(restaurant.id) > Number(highestId);
-    });
-    // console.log(newRestauransts);
-    saveData(newData);
-    return newRestauransts;
-  } else {
-    console.log("Data up to date");
-    return [];
-  }
+  const idFromFile = dataFromFile.map((restaurant) => restaurant.id);
+  console.log(idFromFile);
+  const newRestaurants = newData.filter((restaurant) => {
+    return !idFromFile.includes(restaurant.id);
+  });
+  console.log(newRestaurants.map((restuarant) => restuarant.id));
+  await saveData(newData);
+  return newRestaurants;
 };
 
 export { getData, saveData, updateData };

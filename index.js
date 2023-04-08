@@ -3,7 +3,7 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import config from "./config.json" assert { type: "json" };
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-const intervalTime = 0.1;
+const intervalTime = 3;
 const channelId = "1092473836739506386";
 
 const getLeadingZero = (date) => {
@@ -62,6 +62,11 @@ client.once(Events.ClientReady, (c) => {
                     restaurant.package_day.collection_day.closed_at
                   ).getMinutes()
                 )}`,
+              },
+              {
+                name: "Ważna informacja",
+                value:
+                  "Mati przesyła buziaki dla swojej najcudowniejszej żonki Lidki ❤️🥰💕",
               },
             ],
           },
